@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:habittracker/components/my_button.dart';
 import 'package:habittracker/components/my_drawer.dart';
 import 'package:habittracker/components/my_habit_tile.dart';
+import 'package:habittracker/components/my_heat_map.dart';
 import 'package:habittracker/databases/habit_database.dart';
 import 'package:habittracker/models/habit.dart';
 import 'package:habittracker/util/habit_util.dart';
@@ -135,8 +136,40 @@ class _HomePageState extends State<HomePage> {
         foregroundColor: Theme.of(context).colorScheme.inversePrimary,
         child: Icon(Icons.add),
       ),
-      body: _buildHabitList(),
+      body: ListView(
+        children: [
+          //HeatMap Calendar
+          _buildHeatMap(),
+          //HabitList
+          _buildHabitList(),
+        ],
+      ),
       drawer: MyDrawer(),
+    );
+  }
+
+  Widget _buildHeatMap() {
+    //habit db
+    final habitDb = context.watch<HabitDatabase>();
+    //current habits
+    List<Habit> currentHabits = habitDb.currentHabits;
+
+    //return heatmap ui
+    return FutureBuilder<DateTime?>(
+      future: habitDb.getFirstOpenDate(),
+      builder: (context, snapshot) {
+        // once the first date is available then we can return the heatmap
+        if (snapshot.hasData) {
+          return MyHeatMap(
+            firstDate: snapshot.data!,
+            datasets: getHeatMapDataset(currentHabits),
+          );
+        }
+        //handle state where data is not available
+        else {
+          return Container();
+        }
+      },
     );
   }
 
@@ -145,6 +178,8 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
       child: ListView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
         itemCount: currentHabits.length,
         itemBuilder: (context, index) {
           //get each individual habit

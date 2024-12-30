@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:habittracker/components/my_button.dart';
 import 'package:habittracker/databases/habit_database.dart';
 import 'package:popover/popover.dart';
@@ -67,12 +66,16 @@ class MyHabitTile extends StatelessWidget {
               return IconButton(
                 onPressed: () {
                   showPopover(
+                    arrowHeight: 4,
+                    
+                    arrowWidth: 10,
                     context: context,
                     bodyBuilder: (context) => IntrinsicWidth(
                       child: IntrinsicHeight(
                         child: Container(
                             margin: EdgeInsets.all(0),
-                            //color: Colors.deepOrange,
+                            
+                            color: Theme.of(context).colorScheme.primary,
                             padding: EdgeInsets.all(0),
                             child: Center(
                               child: Column(
@@ -96,7 +99,7 @@ class MyHabitTile extends StatelessWidget {
                                           style: TextStyle(
                                             color: Theme.of(context)
                                                 .colorScheme
-                                                .primary,
+                                                .inversePrimary,
                                             fontSize: 10,
                                           ),
                                         ),
@@ -155,7 +158,7 @@ class MyHabitTile extends StatelessWidget {
                                           style: TextStyle(
                                             color: Theme.of(context)
                                                 .colorScheme
-                                                .primary,
+                                                .inversePrimary,
                                             fontSize: 10,
                                           ),
                                         ),
