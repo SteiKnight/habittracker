@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:habittracker/components/my_button.dart';
 import 'package:habittracker/components/my_drawer.dart';
+import 'package:habittracker/components/my_habit_tile.dart';
 import 'package:habittracker/databases/habit_database.dart';
+import 'package:habittracker/models/habit.dart';
+import 'package:habittracker/util/habit_util.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,7 +15,71 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    //read the existing habits on app startup
+    //Provider.of<HabitDatabase>(context).readHabits();
+    context.read<HabitDatabase>().readHabits();
+
+    // TODO: implement initState
+    super.initState();
+  }
+
   final textController = TextEditingController();
+
+  //change completion
+  changeCompletion(int id, bool? value) {
+    if (value != null) {
+      context.read<HabitDatabase>().updateHabitCompletion(id, value);
+    }
+  }
+
+  //edit a habit
+  void editHabit(Habit habit) {
+    textController.text = habit.name;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Update Habit'),
+        content: TextField(
+          controller: textController,
+          decoration: InputDecoration(
+              hintText: 'eg. 100 pushups',
+              hintStyle: TextStyle(
+                color: Theme.of(context).colorScheme.inversePrimary,
+              )),
+        ),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              //cancel button
+              MyButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  textController.clear();
+                },
+                text: 'Cancel',
+              ),
+              //add habit
+              MyButton(
+                onPressed: () {
+                  String habitName = textController.text;
+                  Navigator.pop(context);
+                  context
+                      .read<HabitDatabase>()
+                      .updateHabitName(habit.id, habitName);
+                  textController.clear();
+                },
+                text: 'Update',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   //create a new habit
   void createNewHabit() {
     showDialog(
@@ -42,9 +109,10 @@ class _HomePageState extends State<HomePage> {
               //add habit
               MyButton(
                 onPressed: () {
-                  textController.clear();
+                  String newHabit = textController.text;
                   Navigator.pop(context);
-                  context.read<HabitDatabase>().addHabit(textController.text);
+                  context.read<HabitDatabase>().addHabit(newHabit);
+                  textController.clear();
                 },
                 text: 'Add',
               ),
@@ -59,13 +127,41 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      drawer: MyDrawer(),
+      //drawer: MyDrawer(),
       floatingActionButton: FloatingActionButton(
         onPressed: createNewHabit,
         elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.tertiary,
         foregroundColor: Theme.of(context).colorScheme.inversePrimary,
         child: Icon(Icons.add),
+      ),
+      body: _buildHabitList(),
+      drawer: MyDrawer(),
+    );
+  }
+
+  Widget _buildHabitList() {
+    List<Habit> currentHabits = context.watch<HabitDatabase>().currentHabits;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+      child: ListView.builder(
+        itemCount: currentHabits.length,
+        itemBuilder: (context, index) {
+          //get each individual habit
+          final habit = currentHabits[index];
+
+          //check if the habit is completed today
+          bool isCompletedToday = isHabitCompletedToday(habit.completedDays);
+          //return habit tile to ui
+          return MyHabitTile(
+            habit: habit,
+            isCompleted: isCompletedToday,
+            onEditTap: () => editHabit(habit),
+            onChanged: (value) {
+              changeCompletion(habit.id, value);
+            },
+          );
+        },
       ),
     );
   }

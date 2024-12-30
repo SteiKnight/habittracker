@@ -34,9 +34,7 @@ class HabitDatabase extends ChangeNotifier {
     return settings?.firstOpenDate;
   }
 
-  /**
-   * CRUD Functions
-   */
+  /// CRUD Functions
 
   //list of habits
   List<Habit> currentHabits = [];
@@ -77,18 +75,17 @@ class HabitDatabase extends ChangeNotifier {
       await isar.writeTxn(() async {
         //if habit is completed we add the current date to the database
         if (isCompleted && !habit.completedDays.contains(DateTime.now())) {
-          final today = DateTime.now();
+          //final today = DateTime.now();
           habit.completedDays.add(DateTime(
             today.year,
             today.month,
             today.day,
           ));
-        } else if (!isCompleted &&
-            habit.completedDays.contains(DateTime.now())) {
+        } else {
           habit.completedDays.removeWhere((date) =>
               date.year == today.year &&
-              date.month == today.year &&
-              date.day == today.year);
+              date.month == today.month &&
+              date.day == today.day);
         }
         //save the updated habits
         await isar.habits.put(habit);
