@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:habittracker/databases/habit_database.dart';
-import 'package:habittracker/pages/home_page.dart';
 import 'package:habittracker/pages/login_page.dart';
 import 'package:habittracker/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
