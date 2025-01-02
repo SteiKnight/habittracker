@@ -7,7 +7,9 @@ class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   //sign in function
-  void signIn() {}
+  void signIn() {
+    
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,6 +128,24 @@ class LoginPage extends StatelessWidget {
                   ExternalLogPanel(
                     imagePath: 'lib/images/apple.png',
                     onTap: () {},
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              //not a member? register now
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Not a member?'),
+                  SizedBox(width: 4),
+                  Text(
+                    'Register now',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
